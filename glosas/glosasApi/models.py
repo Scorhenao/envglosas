@@ -8,6 +8,15 @@ class Glosa(models.Model):
     def show_info(self):
         return f"Código: {self.code_glosa}, Descripción: {self.description}, Monto rechazado: {self.rejected_amount}"
 
+    def getCodigoGlosa(self):
+        return self.code_glosa
+    
+    def getDescriptionGlosa(self):
+        return self.description
+    
+    def getRejectedAmount(self):
+        return self.rejected_amount
+
 class GlosaForLessDocumentation(Glosa):
     missed_documents = models.TextField()
     

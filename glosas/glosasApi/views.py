@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import GlosaForLessDocumentation, GlosaForErrorOFfactoring
 from .forms import GlosaForLessDocumentationForm, GlosaForErrorOFfactoringForm
+
 # CRUD for GlosaForLessDocumentation
 
 def glosa_less_docs_list(request):

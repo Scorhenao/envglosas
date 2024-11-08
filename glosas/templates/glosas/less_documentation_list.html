@@ -4,14 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>List of less documentation glosas</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
 </head>
-<body>
+<body class="d-flex flex-column align-items-center  mt-2">
     <h1>Glosas por falta de documentación</h1>
-    <ul>
-        {% for glosa in glosas %}
-            <li><a href="{% url 'glosasForLessDocumentationDetail' glosa.pk %}">{{ glosa.show_info }}</a></li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'glosasForLessDocumentationCreate' %}">Agregar glosa</a>
+    <section class="container-fluid">
+        <table class="table p-5 mt-5">
+            <thead>
+                <tr>
+                    <th class="col border text-center">Codigo de glosa</th>
+                    <th class="col border text-center">Descripción de glosa</th>
+                    <th class="col border text-center">Cantidad rechazada de glosa</th>
+                    <th class="col border text-center">Acciones</th>
+                </tr>
+            </thead>
+            {% for glosa in glosas %}
+            <tbody>
+                <tr>
+                    <td class="border text-center">{{glosa.getCodigoGlosa}}</td>
+                    <td class="border text-center">{{glosa.getDescriptionGlosa}}</td>
+                    <td class="border text-center">{{glosa.getRejectedAmount}}</td>
+                    <td class="d-flex gap-1 justify-content-center border">
+                        <a class="btn btn-primary" href="{% url 'glosasForLessDocumentationDetail' glosa.pk %}">Ver detalles</a>
+                        <a class="btn btn-success" href="{% url 'glosasForLessDocumentationCreate' %}">Agregar glosa</a>
+                    </td>
+                </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+    </section>
+    
+    {% block content %}
+    {% endblock %}
 </body>
 </html>
