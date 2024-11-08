@@ -11,7 +11,7 @@ class Glosa(models.Model):
 class GlosaForLessDocumentation(Glosa):
     missed_documents = models.TextField()
     
-    def mostrar_info(self):
+    def show_info(self):
         return super().show_info() + f", Documentos faltantes: {self.missed_documents}"
 
 class GlosaForErrorOFfactoring(Glosa):

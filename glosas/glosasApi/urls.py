@@ -12,7 +12,7 @@ urlpatterns = [
     # URLs for GlosaForErrorOFfactoring
     path('error_factoring/', views.glosa_error_factoring_list, name='glosasForErrorOFfactoringList'),
     path('error_factoring/<int:pk>/', views.glosa_error_factoring_detail, name='glosaForErrorOFfactoringDetail'),
-    path('error_factoring/add/', views.glosa_error_factoring_create, name='glosaForErrorOFfactoringAdd'),
+    path('error_factoring/add/', views.glosa_error_factoring_create, name='glosaForErrorOFfactoringCreate'),
     path('error_factoring/<int:pk>/update/', views.glosa_error_factoring_update, name='glosaForErrorOFfactoringUpdate'),
     path('error_factoring/<int:pk>/delete/', views.glosa_error_factoring_delete, name='glosaForErrorOFfactoringDelete'),
 ]

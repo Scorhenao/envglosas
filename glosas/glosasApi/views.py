@@ -58,7 +58,7 @@ def glosa_error_factoring_create(request):
             return redirect('glosasForErrorOFfactoringList')
     else:
         form = GlosaForErrorOFfactoringForm()
-    return render(request, 'glosas/error_factoring_form.html', {'form': form})
+        return render(request, 'glosas/error_factoring_form.html', {'form': form})
 
 def glosa_error_factoring_update(request, pk):
     glosa = get_object_or_404(GlosaForErrorOFfactoring, pk=pk)
