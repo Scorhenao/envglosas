@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles de glosa por falta de documentación</title>
+</head>
+<body>
+    <h1>Detalles de la falta de documentación</h1>
+    <table>
+        <tr>
+            <th>Codigo de glosa:</th>
+            <td>{{ glosas.code_glosa }}</td>
+        </tr>
+        
+        <tr>
+            <th>Descripción de glosa:</th>
+            <td>{{ glosas.description }}</td>
+        </tr>
+        
+        <tr>
+            <th>Cantidad rechazada de glosa:</th>
+            <td>{{ glosas.rejected_amount }}</td>
+        </tr>
+        
+        <tr>
+            <th>Codigo de glosa:</th>
+            <td>{{ glosas.missed_documents }}</td>
+        </tr>
+    </table>
+    <a href="{% url 'glosasForLessDocumentationUpdate' glosas.pk %}">Editar</a>
+    <a href="{% url 'glosasForLessDocumentationDelete' glosas.pk %}">Eliminar</a>
+
+    <a href="{% url 'glosasForLessDocumentationList' %}">Volver a ver glosas por falta de documentación</a>
+</body>
+</html>
