@@ -11,11 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from bootstrap5 import bootstrap
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Use bootstrap 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bootstrap5',
+    'rest_framework',
     'glosasApi'
 ]
 
@@ -78,19 +78,14 @@ WSGI_APPLICATION = 'glosas.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mssql',
-        'NAME': 'GlosasDB',
-        'USER': 'root',  
-        'PASSWORD': '123',
-        'HOST': r'SCORELAPTOP\SQLEXPRESS', 
-        'PORT': '49170', 
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-            'extra_params': 'TrustServerCertificate=yes;',
-        }
+        'ENGINE': 'django.db.backends.mysql',  # Usa el backend de MySQL
+        'NAME': 'GlosasDB',          # Reemplaza con el nombre de tu base de datos
+        'USER': 'root',                    # Usuario de la base de datos
+        'PASSWORD': '1234',             # Contraseña del usuario
+        'HOST': 'localhost',                  # Dirección del servidor de MySQL (localhost si es local)
+        'PORT': '3306',                       # Puerto de MySQL (3306 es el predeterminado)
     }
 }
-
 
 
 # Password validation
