@@ -15,118 +15,82 @@ from django.http import JsonResponse
 
 # CRUD for GlosaForLessDocumentation
 
+
 class GlosaForLessDocumentationListView(generics.ListAPIView):
     queryset = GlosaForLessDocumentation.objects.all()
     serializer_class = GlosaForLessDocumentationSerializer
+
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response({
             "status": "200",
-            "data": serializer.data, 
+            "data": serializer.data,
             "message": "List retrieved successfully"
         }, status=status.HTTP_200_OK)
 
+
 class GlosaForLessDocumentationDetailView(APIView):
-    def get(self, request, pk=None):
+    def get_object(self, pk):
         try:
-            # Buscar el objeto por su ID (pk)
-            instance = GlosaForLessDocumentation.objects.get(pk=pk)
-            serializer = GlosaForLessDocumentationSerializer(instance)
-            return Response({
-                "status": "200",
-                "data": serializer.data,
-                "message": "Glosa retrieved successfully"
-            }, status=status.HTTP_200_OK)
+            return GlosaForLessDocumentation.objects.get(pk=pk)
         except GlosaForLessDocumentation.DoesNotExist:
-            # Devolver respuesta de objeto no encontrado
-            return Response({
-                "status": "error",
-                "message": "GlosaForLessDocumentation not found"
-            }, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            # Manejar errores genéricos
-            return exception_response(e)
+            raise NotFound(detail="GlosaForLessDocumentation not found")
 
-    
+    def get(self, request, pk=None):
+        instance = self.get_object(pk)
+        serializer = GlosaForLessDocumentationSerializer(instance)
+        return Response({
+            "status": "200",
+            "data": serializer.data,
+            "message": "Glosa retrieved successfully"
+        }, status=status.HTTP_200_OK)
 
-def glosa_less_docs_create(request):
-    if request.method == 'POST':
-        form = GlosaForLessDocumentationForm(request.POST)
-        if form.is_valid():
-            glosa = form.save()
-            # Respuesta JSON si es necesario
-            if request.headers.get('Accept') == 'application/json':
-                response = {
-                    "status": "201",
-                    "data": {
-                        "id": glosa.pk,
-                        "code_glosa": glosa.code_glosa,
-                        "description": glosa.description,
-                        "rejected_amount": glosa.rejected_amount,
-                        "missed_documents": glosa.missed_documents
-                    },
-                    "message": "Glosa created successfully."
-                }
-                return JsonResponse(response)
-            # Redirección para usuarios normales
-            return redirect('glosasForLessDocumentationList')
-        else:
-            # Manejo de errores para un formulario inválido
-            return render(request, 'glosas/less_documentation_create.html', {'form': form})
-    else:
-        # Renderizar formulario vacío en método GET
-        form = GlosaForLessDocumentationForm()
-        return render(request, 'glosas/less_documentation_form.html', {'form': form})
-def glosa_less_docs_update(request, pk):
-    glosa = get_object_or_404(GlosaForLessDocumentation, pk=pk)
-    if request.method == 'POST':
-        form = GlosaForLessDocumentationForm(request.POST, instance=glosa)
-        if form.is_valid():
-            form.save()
-            response = {
-                "status": "success",
-                "data": {
-                    "id": glosa.pk,
-                    "code_glosa": glosa.code_glosa,
-                    "description": glosa.description,
-                },
-                "message": "Glosa updated successfully."
-            }
-            return JsonResponse(response, status=200)
-        else:
-            response = {
-                "status": "error",
-                "data": {},
-                "message": "Failed to update glosa. Invalid data."
-            }
-            return JsonResponse(response, status=400)
-    else:
-        response = {
-            "status": "error",
-            "data": {},
-            "message": "GET method not allowed for update."
-        }
-        return JsonResponse(response, status=405)
 
-def glosa_less_docs_delete(request, pk):
-    glosa = get_object_or_404(GlosaForLessDocumentation, pk=pk)
-    if request.method == 'POST':
-        glosa.delete()
-        response = {
-            "status": "success",
-            "data": {},
-            "message": "Glosa deleted successfully."
-        }
-        return JsonResponse(response, status=204)
-    else:
-        response = {
-            "status": "error",
-            "data": {},
-            "message": "GET method not allowed for deletion."
-        }
-        return JsonResponse(response, status=405)
+class GlosaForLessDocumentationCreateView(generics.CreateAPIView):
+    queryset = GlosaForLessDocumentation.objects.all()
+    serializer_class = GlosaForLessDocumentationSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({
+            "status": "201",
+            "data": serializer.data,
+            "message": "Glosa created successfully"
+        }, status=status.HTTP_201_CREATED)
+
+
+class GlosaForLessDocumentationUpdateView(generics.UpdateAPIView):
+    queryset = GlosaForLessDocumentation.objects.all()
+    serializer_class = GlosaForLessDocumentationSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({
+            "status": "200",
+            "data": serializer.data,
+            "message": "Glosa updated successfully"
+        }, status=status.HTTP_200_OK)
+
+
+class GlosaForLessDocumentationDeleteView(generics.DestroyAPIView):
+    queryset = GlosaForLessDocumentation.objects.all()
+    serializer_class = GlosaForLessDocumentationSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({
+            "status": "204",
+            "message": "Glosa deleted successfully"
+        }, status=status.HTTP_204_NO_CONTENT)
+        
 # CRUD for GlosaForErrorOFfactoring
 
 class GlosaForErrorOFfactoringListView(generics.ListAPIView):
