@@ -1,4 +1,5 @@
 from rest_framework import generics,status
+from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import GlosaForLessDocumentation, GlosaForErrorOFfactoring
@@ -14,8 +15,6 @@ from django.http import JsonResponse
 
 
 # CRUD for GlosaForLessDocumentation
-
-
 class GlosaForLessDocumentationListView(generics.ListAPIView):
     queryset = GlosaForLessDocumentation.objects.all()
     serializer_class = GlosaForLessDocumentationSerializer
@@ -91,48 +90,84 @@ class GlosaForLessDocumentationDeleteView(generics.DestroyAPIView):
             "message": "Glosa deleted successfully"
         }, status=status.HTTP_204_NO_CONTENT)
         
-# CRUD for GlosaForErrorOFfactoring
 
+# CRUD para GlosaForErrorOFfactoring
+# Listar todas las instancias
 class GlosaForErrorOFfactoringListView(generics.ListAPIView):
     queryset = GlosaForErrorOFfactoring.objects.all()
     serializer_class = GlosaForErrorOFfactoringSerializer
+
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response({
             "status": "200",
-            "data": serializer.data, 
+            "data": serializer.data,
             "message": "List retrieved successfully"
         }, status=status.HTTP_200_OK)
 
-def glosa_error_factoring_detail(request, pk):
-    glosa = get_object_or_404(GlosaForErrorOFfactoring, pk=pk)
-    return render(request, 'glosas/error_factoring_detail.html', {'glosa': glosa})
+# Detalle de una instancia
+class GlosaForErrorOFfactoringDetailView(APIView):
+    def get_object(self, pk):
+        try:
+            return GlosaForErrorOFfactoring.objects.get(pk=pk)
+        except GlosaForErrorOFfactoring.DoesNotExist:
+            raise NotFound(detail="GlosaForErrorOFfactoring not found")
 
-def glosa_error_factoring_create(request):
-    if request.method == 'POST':
-        form = GlosaForErrorOFfactoringForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('glosasForErrorOFfactoringList')
-    else:
-        form = GlosaForErrorOFfactoringForm()
-        return render(request, 'glosas/error_factoring_form.html', {'form': form})
+    def get(self, request, pk=None):
+        instance = self.get_object(pk)
+        serializer = GlosaForErrorOFfactoringSerializer(instance)
+        return Response({
+            "status": "200",
+            "data": serializer.data,
+            "message": "Glosa retrieved successfully"
+        }, status=status.HTTP_200_OK)
 
-def glosa_error_factoring_update(request, pk):
-    glosa = get_object_or_404(GlosaForErrorOFfactoring, pk=pk)
-    if request.method == 'POST':
-        form = GlosaForErrorOFfactoringForm(request.POST, instance=glosa)
-        if form.is_valid():
-            form.save()
-            return redirect('glosasForErrorOFfactoringList')
-    else:
-        form = GlosaForErrorOFfactoringForm(instance=glosa)
-    return render(request, 'glosas/error_factoring_form.html', {'form': form})
+# Crear una nueva instancia
+class GlosaForErrorOFfactoringCreateView(generics.CreateAPIView):
+    queryset = GlosaForErrorOFfactoring.objects.all()
+    serializer_class = GlosaForErrorOFfactoringSerializer
 
-def glosa_error_factoring_delete(request, pk):
-    glosa = get_object_or_404(GlosaForErrorOFfactoring, pk=pk)
-    if request.method == 'POST':
-        glosa.delete()
-        return redirect('glosasForErrorOFfactoringList')
-    return render(request, 'glosas/error_factoring_confirm_delete.html', {'glosa': glosa})
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({
+            "status": "201",
+            "data": serializer.data,
+            "message": "Glosa created successfully"
+        }, status=status.HTTP_201_CREATED)
+
+# Actualizar una instancia existente
+class GlosaForErrorOFfactoringUpdateView(generics.UpdateAPIView):
+    queryset = GlosaForErrorOFfactoring.objects.all()
+    serializer_class = GlosaForErrorOFfactoringSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({
+            "status": "200",
+            "data": serializer.data,
+            "message": "Glosa updated successfully"
+        }, status=status.HTTP_200_OK)
+
+# Eliminar una instancia
+class GlosaForErrorOFfactoringDeleteView(generics.DestroyAPIView):
+    queryset = GlosaForErrorOFfactoring.objects.all()
+    serializer_class = GlosaForErrorOFfactoringSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({
+            "status": "204",
+            "message": "Glosa deleted successfully"
+        }, status=status.HTTP_204_NO_CONTENT)
+
+
+def dashboard_view(request):
+    return render(request, 'glosas/dashboard.html')

@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Gestión de Glosas</h1>
+
+<!-- Botón para agregar una nueva glosa -->
+<div class="mb-3">
+    <button id="addGlosa" class="btn btn-primary">Agregar Nueva Glosa</button>
+</div>
+
+<!-- Tabla de Glosas -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Monto Rechazado</th>
+            <th>Documentos Faltantes</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="glosaTable">
+        <!-- Aquí se cargan las filas dinámicamente -->
+    </tbody>
+</table>
+
+<!-- Modal para Crear/Editar Glosa -->
+<div class="modal fade" id="glosaModal" tabindex="-1" aria-labelledby="glosaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="glosaModalLabel">Agregar/Editar Glosa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="glosaForm">
+                    <input type="hidden" id="glosaId">
+                    <div class="mb-3">
+                        <label for="glosaCode" class="form-label">Código de Glosa</label>
+                        <input type="text" class="form-control" id="glosaCode" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="glosaDescription" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="glosaDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rejectedAmount" class="form-label">Monto Rechazado</label>
+                        <input type="number" class="form-control" id="rejectedAmount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="missedDocuments" class="form-label">Documentos Faltantes</label>
+                        <input type="text" class="form-control" id="missedDocuments">
+                    </div>
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BASE_URL = 'http://127.0.0.1:8000/api/';
+    const apiUrl = '/glosas/less_documentation/';
+    const glosaTable = document.getElementById('glosaTable');
+    const glosaModal = new bootstrap.Modal(document.getElementById('glosaModal'));
+    const glosaForm = document.getElementById('glosaForm');
+    const glosaIdField = document.getElementById('glosaId');
+    const glosaCodeField = document.getElementById('glosaCode');
+    const glosaDescriptionField = document.getElementById('glosaDescription');
+    const rejectedAmountField = document.getElementById('rejectedAmount');
+    const missedDocumentsField = document.getElementById('missedDocuments');
+    const addGlosaButton = document.getElementById('addGlosa');
+
+    // Obtener lista de glosas
+    async function fetchGlosas() {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        renderGlosas(data.data);
+    }
+
+    // Renderizar las glosas en la tabla
+    function renderGlosas(glosas) {
+        glosaTable.innerHTML = '';
+        glosas.forEach(glosa => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${glosa.id}</td>
+                <td>${glosa.code_glosa}</td>
+                <td>${glosa.description}</td>
+                <td>${glosa.rejected_amount}</td>
+                <td>${glosa.missed_documents}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="editGlosa(${glosa.id}, '${glosa.code_glosa}', '${glosa.description}', ${glosa.rejected_amount}, '${glosa.missed_documents}')">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteGlosa(${glosa.id})">Eliminar</button>
+                </td>
+            `;
+            glosaTable.appendChild(row);
+        });
+    }
+
+    // Guardar (crear o editar) glosa
+    async function saveGlosa(event) {
+        event.preventDefault();
+        const id = glosaIdField.value;
+        const payload = {
+            code_glosa: glosaCodeField.value,
+            description: glosaDescriptionField.value,
+            rejected_amount: rejectedAmountField.value,
+            missed_documents: missedDocumentsField.value,
+        };
+
+        const options = {
+            method: id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        };
+
+        const url = id ? `${apiUrl}${id}/update/` : `${apiUrl}add/`;
+
+        await fetch(url, options);
+        glosaModal.hide();
+        fetchGlosas();
+    }
+
+    // Eliminar glosa
+    async function deleteGlosa(id) {
+        if (confirm('¿Estás seguro de eliminar esta glosa?')) {
+            await fetch(`${apiUrl}${id}/delete/`, { method: 'DELETE' });
+            fetchGlosas();
+        }
+    }
+
+    // Editar glosa
+    function editGlosa(id, code_glosa, description, rejected_amount, missed_documents) {
+        glosaIdField.value = id;
+        glosaCodeField.value = code_glosa;
+        glosaDescriptionField.value = description;
+        rejectedAmountField.value = rejected_amount;
+        missedDocumentsField.value = missed_documents;
+        glosaModal.show();
+    }
+
+    // Evento para abrir el modal de agregar
+    addGlosaButton.addEventListener('click', () => {
+        glosaIdField.value = '';
+        glosaCodeField.value = '';
+        glosaDescriptionField.value = '';
+        rejectedAmountField.value = '';
+        missedDocumentsField.value = '';
+        glosaModal.show();
+    });
+
+    // Evento para enviar el formulario
+    glosaForm.addEventListener('submit', saveGlosa);
+
+    // Cargar las glosas al iniciar
+    document.addEventListener('DOMContentLoaded', fetchGlosas);
+</script>
+{% endblock %}

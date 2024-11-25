@@ -19,4 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('api/', include('glosasApi.urls')),
+    path('dashboard/', views.dashboard_view, name='dashboard'),
+
 ]
