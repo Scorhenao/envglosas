@@ -60,8 +60,7 @@
 </div>
 
 <script>
-    const BASE_URL = 'http://127.0.0.1:8000/api/';
-    const apiUrl = '/glosas/less_documentation/';
+    import { GET_GLOSAS_LESS_DOCUMENTATION } from '../../static/js/urls.js'
     const glosaTable = document.getElementById('glosaTable');
     const glosaModal = new bootstrap.Modal(document.getElementById('glosaModal'));
     const glosaForm = document.getElementById('glosaForm');
@@ -72,14 +71,13 @@
     const missedDocumentsField = document.getElementById('missedDocuments');
     const addGlosaButton = document.getElementById('addGlosa');
 
-    // Obtener lista de glosas
     async function fetchGlosas() {
-        const response = await fetch(apiUrl);
+        const response = await fetch(GET_GLOSAS_LESS_DOCUMENTATION);
         const data = await response.json();
+        console.log(data);
         renderGlosas(data.data);
     }
 
-    // Renderizar las glosas en la tabla
     function renderGlosas(glosas) {
         glosaTable.innerHTML = '';
         glosas.forEach(glosa => {
@@ -123,7 +121,6 @@
         fetchGlosas();
     }
 
-    // Eliminar glosa
     async function deleteGlosa(id) {
         if (confirm('¿Estás seguro de eliminar esta glosa?')) {
             await fetch(`${apiUrl}${id}/delete/`, { method: 'DELETE' });
@@ -131,7 +128,6 @@
         }
     }
 
-    // Editar glosa
     function editGlosa(id, code_glosa, description, rejected_amount, missed_documents) {
         glosaIdField.value = id;
         glosaCodeField.value = code_glosa;
@@ -141,7 +137,6 @@
         glosaModal.show();
     }
 
-    // Evento para abrir el modal de agregar
     addGlosaButton.addEventListener('click', () => {
         glosaIdField.value = '';
         glosaCodeField.value = '';
@@ -151,10 +146,8 @@
         glosaModal.show();
     });
 
-    // Evento para enviar el formulario
     glosaForm.addEventListener('submit', saveGlosa);
 
-    // Cargar las glosas al iniciar
     document.addEventListener('DOMContentLoaded', fetchGlosas);
 </script>
 {% endblock %}
